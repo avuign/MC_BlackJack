@@ -11,15 +11,15 @@ class Suit(Enum):
 
 class Rank(Enum):
     ACE = "Ace"
-    TWO = "2"
-    THREE = "3"
-    FOUR = "4"
-    FIVE = "5"
-    SIX = "6"
-    SEVEN = "7"
-    EIGHT = "8"
-    NINE = "9"
-    TEN = "10"
+    TWO = 2
+    THREE = 3
+    FOUR = 4
+    FIVE = 5
+    SIX = 6
+    SEVEN = 7
+    EIGHT = 8
+    NINE = 9
+    TEN = 10
     JACK = "Jack"
     QUEEN = "Queen"
     KING = "King"
@@ -39,10 +39,21 @@ class Card:
         return self.rank == other.rank and self.suit == other.suit
 
 
+# initialize a list of all 52 cards
+def init_cards():
+    cards = []
+    for suit in Suit:
+        for rank in Rank:
+            cards.append(Card(rank, suit))
+    return cards
+
+
 class Deck:
-    def __init__(self, cards):
-        # cards should be a stack (a list) of Card
-        self.cards = cards
+    def __init__(self, cards=None):
+        if cards is None:
+            self.cards = init_cards()
+        else:
+            self.cards = cards
 
     # Fisher-Yates shuffle
     def shuffle(self):
@@ -54,6 +65,8 @@ class Deck:
         self.cards = shuffled_cards
 
     def __str__(self):
+        if len(self.cards) == 0:
+            return "deck is empty"
         deck = ""
         for card in self.cards:
             deck += str(card) + ", "
@@ -66,15 +79,39 @@ class Deck:
 
 
 class Hand:
-    def __init__(self, cards=[], score=0):
-        self.cards = cards
-        self.score = score
-
-    def draw_card(self, deck):
-        if len(deck.cards) > 0:
-            self.cards.append(deck.cards.pop())
+    def __init__(self, cards=None):
+        if cards is None:
+            self.cards = []
         else:
-            raise Exception("deck is empty !")
+            self.cards = cards
+
+    def score(self):
+        score = 0
+        n_aces = 0
+        for card in self.cards:
+            if (
+                card.rank == Rank.JACK
+                or card.rank == Rank.QUEEN
+                or card.rank == Rank.KING
+            ):
+                score += 10
+            elif card.rank == Rank.ACE:
+                score += 11
+                n_aces += 1
+            else:
+                score += card.rank.value
+        while score > 21 and n_aces > 0:
+            score -= 10
+            n_aces -= 1
+        return score
+
+    def draw_card(self, deck, n=1):
+        while n > 0:
+            if len(deck.cards) > 0:
+                self.cards.append(deck.cards.pop())
+                n -= 1
+            else:
+                raise Exception("deck is empty !")
 
     def __str__(self):
         deck = ""
