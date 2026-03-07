@@ -10,19 +10,19 @@ class Suit(Enum):
 
 
 class Rank(Enum):
-    ACE = "Ace"
-    TWO = 2
-    THREE = 3
-    FOUR = 4
-    FIVE = 5
-    SIX = 6
-    SEVEN = 7
-    EIGHT = 8
-    NINE = 9
-    TEN = 10
-    JACK = "Jack"
-    QUEEN = "Queen"
-    KING = "King"
+    ACE = ("Ace", 11)
+    TWO = ("Two", 2)
+    THREE = ("Three", 3)
+    FOUR = ("Four", 4)
+    FIVE = ("Five", 5)
+    SIX = ("Six", 6)
+    SEVEN = ("Seven", 7)
+    EIGHT = ("Eight", 8)
+    NINE = ("Nine", 9)
+    TEN = ("Ten", 10)
+    JACK = ("Jack", 10)
+    QUEEN = ("Queen", 10)
+    KING = ("King", 10)
 
 
 class Card:
@@ -31,12 +31,15 @@ class Card:
         self.suit = suit
 
     def __str__(self):
-        return f"{self.rank.value} of {self.suit.value}"
+        return f"{self.rank.value[0]} of {self.suit.value}"
 
     def __eq__(self, other):
         if not isinstance(other, Card):
             return NotImplemented
         return self.rank == other.rank and self.suit == other.suit
+
+    def get_value(self):
+        return self.rank.value[1]
 
 
 # initialize a list of all 52 cards
@@ -84,22 +87,15 @@ class Hand:
             self.cards = []
         else:
             self.cards = cards
+        self.bet = 1
 
     def score(self):
         score = 0
         n_aces = 0
         for card in self.cards:
-            if (
-                card.rank == Rank.JACK
-                or card.rank == Rank.QUEEN
-                or card.rank == Rank.KING
-            ):
-                score += 10
-            elif card.rank == Rank.ACE:
-                score += 11
+            if card.rank == Rank.ACE:
                 n_aces += 1
-            else:
-                score += card.rank.value
+            score += card.get_value()
         while score > 21 and n_aces > 0:
             score -= 10
             n_aces -= 1
@@ -112,6 +108,13 @@ class Hand:
                 n -= 1
             else:
                 raise Exception("deck is empty !")
+
+    def double(self, deck):
+        if len(self.cards) < 3:
+            self.bet += 1
+            self.draw_card(deck)
+        else:
+            raise Exception("Can not double with more than 2 cards.")
 
     def __str__(self):
         deck = ""
