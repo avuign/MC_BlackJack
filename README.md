@@ -18,7 +18,7 @@ If you also want to do some data analysis you will need pandas and matplotlib li
 
 1. Clone this repository 
 `git clone https://github.com/avuign/MC_BlackJack.git
-cd MC_BlackJack
+cd MC_BlackJack`
 
 2. You can play BlackJack on the terminal by running 
 `python3 play_blackjack.py`
